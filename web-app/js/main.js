@@ -41,42 +41,42 @@ function debounce(func, delay) {
 document.addEventListener('DOMContentLoaded', function () {
 
     // ── Core DOM references ──────────────────────────────────────────
-    var html           = document.documentElement;
+    var html = document.documentElement;
     var themeColorMeta = document.getElementById('themeColorMeta');
-    var themeToggle    = document.getElementById('themeToggle');
-    var soundToggle    = document.getElementById('soundToggle');
-    var backToTopButton= document.getElementById('backToTop');
-    var tabs           = Array.from(document.querySelectorAll('.tab'));
-    var projectCards   = Array.from(document.querySelectorAll('.project-card'));
-    var modal          = document.getElementById('projectModal');
-    var modalClose     = document.getElementById('modalClose');
-    var modalBody      = document.getElementById('modalBody');
-    var modalTitle     = document.getElementById('modalDialogTitle');
+    var themeToggle = document.getElementById('themeToggle');
+    var soundToggle = document.getElementById('soundToggle');
+    var backToTopButton = document.getElementById('backToTop');
+    var tabs = Array.from(document.querySelectorAll('.tab'));
+    var projectCards = Array.from(document.querySelectorAll('.project-card'));
+    var modal = document.getElementById('projectModal');
+    var modalClose = document.getElementById('modalClose');
+    var modalBody = document.getElementById('modalBody');
+    var modalTitle = document.getElementById('modalDialogTitle');
     var randomProjectBtn = document.getElementById('randomProjectBtn');
 
     // ── PLAYGROUND: sections we need to show / hide ──────────────────
-    var projectsSection   = document.querySelector('.projects-section');   // ← PLAYGROUND ADD
+    var projectsSection = document.querySelector('.projects-section');   // ← PLAYGROUND ADD
     var playgroundSection = document.getElementById('playgroundSection');  // ← PLAYGROUND ADD
 
     // Search elements
-    var searchInput          = document.getElementById('projectSearch');
-    var searchClear          = document.getElementById('searchClear');
-    var searchDropdown       = document.getElementById('searchDropdown');
-    var searchShortcut       = document.getElementById('searchShortcut');
-    var searchLoader         = document.getElementById('searchLoader');
-    var emptyState           = document.getElementById('emptyState');
-    var resultsList          = document.getElementById('resultsList');
-    var resultsSection       = document.getElementById('resultsSection');
-    var recentSearchesList   = document.getElementById('recentSearchesList');
-    var recentSearchesSection= document.getElementById('recentSearchesSection');
-    var tipsSection          = document.getElementById('tipsSection');
+    var searchInput = document.getElementById('projectSearch');
+    var searchClear = document.getElementById('searchClear');
+    var searchDropdown = document.getElementById('searchDropdown');
+    var searchShortcut = document.getElementById('searchShortcut');
+    var searchLoader = document.getElementById('searchLoader');
+    var emptyState = document.getElementById('emptyState');
+    var resultsList = document.getElementById('resultsList');
+    var resultsSection = document.getElementById('resultsSection');
+    var recentSearchesList = document.getElementById('recentSearchesList');
+    var recentSearchesSection = document.getElementById('recentSearchesSection');
+    var tipsSection = document.getElementById('tipsSection');
 
-    var recentSearches       = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-    var currentSearchQuery   = '';
+    var recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+    var currentSearchQuery = '';
     var selectedSuggestionIndex = -1;
-    var currentCategory      = 'all';
-    var lastFocusedElement   = null;
-    var removeTrap           = null;
+    var currentCategory = 'all';
+    var lastFocusedElement = null;
+    var removeTrap = null;
 
     // ── PLAYGROUND: track whether playground tab is active ──────────
     var playgroundActive = false;  // ← PLAYGROUND ADD
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         themeToggle.addEventListener('click', function () {
             var currentTheme = html.getAttribute('data-theme');
-            var newTheme     = currentTheme === 'light' ? 'dark' : 'light';
+            var newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
@@ -160,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function showProjectsSection() {
         playgroundActive = false;
         if (playgroundSection) playgroundSection.style.display = 'none';
-        if (projectsSection)   projectsSection.style.display   = '';
-        if (randomProjectBtn)  randomProjectBtn.style.display  = '';
+        if (projectsSection) projectsSection.style.display = '';
+        if (randomProjectBtn) randomProjectBtn.style.display = '';
         if (window.playgroundAPI && typeof window.playgroundAPI.deactivate === 'function') {
             window.playgroundAPI.deactivate();
         }
@@ -169,8 +169,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showPlaygroundSection() {
         playgroundActive = true;
-        if (projectsSection)   projectsSection.style.display   = 'none';
-        if (randomProjectBtn)  randomProjectBtn.style.display  = 'none';
+        if (projectsSection) projectsSection.style.display = 'none';
+        if (randomProjectBtn) randomProjectBtn.style.display = 'none';
         if (window.playgroundAPI && typeof window.playgroundAPI.activate === 'function') {
             window.playgroundAPI.activate();
         }
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function moveTabFocus(fromIndex, delta) {
-        var len  = tabs.length;
+        var len = tabs.length;
         var next = (fromIndex + delta + len) % len;
         tabs.forEach(function (t, i) {
             var selected = i === next;
@@ -262,36 +262,44 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!query) return [];
         var matches = [];
         projectCards.forEach(function (card) {
-            var category    = card.getAttribute('data-category');
-            var title       = card.querySelector('h3').textContent.toLowerCase();
+            var category = card.getAttribute('data-category');
+            var title = card.querySelector('h3').textContent.toLowerCase();
             var description = card.querySelector('p').textContent.toLowerCase();
-            var tags        = (card.getAttribute('data-tags') || '').toLowerCase();
+            var tags = (card.getAttribute('data-tags') || '').toLowerCase();
 
             var categoryMatch = currentCategory === 'all' || category === currentCategory;
-            var searchMatch   = title.includes(query) ||
-                                description.includes(query) ||
-                                tags.includes(query);
+            var searchMatch = title.includes(query) ||
+                description.includes(query) ||
+                tags.includes(query);
 
             if (categoryMatch && searchMatch) {
                 matches.push({
-                    card     : card,
-                    title    : card.querySelector('h3').textContent,
-                    tags     : card.getAttribute('data-tags') || '',
-                    category : category
+                    card: card,
+                    title: card.querySelector('h3').textContent,
+                    tags: card.getAttribute('data-tags') || '',
+                    category: category
                 });
             }
         });
         return matches;
     }
 
-    function highlightMatch(text, query) {
-        var escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        var parts = text.split(new RegExp('(' + escapedQuery + ')', 'gi'));
-        return parts.map(function (part) {
-            return part.toLowerCase() === query.toLowerCase()
-                ? '<mark style="background:rgba(99,102,241,0.3);color:var(--primary-color);font-weight:600;">' + part + '</mark>'
-                : part;
-        }).join('');
+    function highlightText(container, text, query) {
+        const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const chunks = text.split(new RegExp(`(${safeQuery})`, 'gi'));
+
+        chunks.forEach((part) => {
+            if (part.toLowerCase() === query.toLowerCase()) {
+                const highlight = document.createElement('mark');
+                highlight.style.background = 'rgba(99, 102, 241, 0.3)';
+                highlight.style.color = 'var(--primary-color)';
+                highlight.style.fontWeight = '600';
+                highlight.textContent = part;
+                container.appendChild(highlight);
+            } else if (part) {
+                container.appendChild(document.createTextNode(part));
+            }
+        });
     }
 
     function updateSuggestionHighlight() {
@@ -304,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function selectSuggestion(title) {
         if (!searchInput) return;
-        searchInput.value  = title;
+        searchInput.value = title;
         currentSearchQuery = title.toLowerCase();
         performSearch();
         closeDropdown();
@@ -346,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (recentSearches.length === 0) {
             recentSearchesSection.style.display = 'none';
-            if (tipsSection)    tipsSection.style.display    = 'block';
+            if (tipsSection) tipsSection.style.display = 'block';
             if (resultsSection) resultsSection.style.display = 'none';
             return;
         }
@@ -356,28 +364,42 @@ document.addEventListener('DOMContentLoaded', function () {
             recentSearches.slice(0, 5).forEach(function (search) {
                 var item = document.createElement('div');
                 item.className = 'dropdown-recent-item';
-                item.innerHTML =
-                    '<div class="dropdown-recent-text">' +
-                        '<i class="fas fa-history" style="opacity:0.5;font-size:0.9rem;"></i>' +
-                        '<span style="flex:1;cursor:pointer;color:var(--text-secondary);">' + search + '</span>' +
-                    '</div>' +
-                    '<button class="dropdown-recent-remove" aria-label="Remove search">' +
-                        '<i class="fas fa-x"></i>' +
-                    '</button>';
+                const recentText = document.createElement('div');
+                recentText.className = 'dropdown-recent-text';
 
-                var textElement = item.querySelector('span');
-                var removeBtn   = item.querySelector('.dropdown-recent-remove');
+                const clockIcon = document.createElement('i');
+                clockIcon.className = 'fas fa-history';
+                clockIcon.style.opacity = '0.5';
+                clockIcon.style.fontSize = '0.9rem';
 
-                textElement.addEventListener('click', function () {
+                const searchLabel = document.createElement('span');
+                searchLabel.style.flex = '1';
+                searchLabel.style.cursor = 'pointer';
+                searchLabel.style.color = 'var(--text-secondary)';
+                searchLabel.textContent = search;
+
+                recentText.append(clockIcon, searchLabel);
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'dropdown-recent-remove';
+                removeButton.setAttribute('aria-label', 'Remove search');
+
+                const removeIcon = document.createElement('i');
+                removeIcon.className = 'fas fa-x';
+                removeButton.appendChild(removeIcon);
+
+                item.append(recentText, removeButton);
+
+                searchLabel.addEventListener('click', () => {
                     if (searchInput) {
-                        searchInput.value  = search;
+                        searchInput.value = search;
                         currentSearchQuery = search;
                         performSearch();
                         closeDropdown();
                     }
                 });
 
-                removeBtn.addEventListener('click', function (e) {
+                removeButton.addEventListener('click', (e) => {
                     e.stopPropagation();
                     recentSearches = recentSearches.filter(function (s) { return s !== search; });
                     localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
@@ -390,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         recentSearchesSection.style.display = 'block';
         if (resultsSection) resultsSection.style.display = 'none';
-        if (tipsSection)    tipsSection.style.display    = 'block';
+        if (tipsSection) tipsSection.style.display = 'block';
     }
 
     function renderSuggestions(query) {
@@ -399,25 +421,34 @@ document.addEventListener('DOMContentLoaded', function () {
         var matches = getMatchingProjects(query);
 
         if (matches.length === 0) {
-            if (resultsSection)        resultsSection.style.display        = 'none';
+            if (resultsSection) resultsSection.style.display = 'none';
             if (recentSearchesSection) recentSearchesSection.style.display = 'none';
-            if (tipsSection)           tipsSection.style.display           = 'block';
+            if (tipsSection) tipsSection.style.display = 'block';
             return;
         }
 
         if (resultsList) {
             resultsList.innerHTML = '';
             matches.slice(0, 8).forEach(function (project, index) {
-                var item    = document.createElement('div');
+                var item = document.createElement('div');
                 item.className = 'dropdown-item' + (index === selectedSuggestionIndex ? ' selected' : '');
-                var iconEl  = project.card.querySelector('.card-icon');
-                var iconText = iconEl ? iconEl.textContent : '';
-                item.innerHTML =
-                    '<div class="dropdown-item-icon">' + iconText + '</div>' +
-                    '<div class="dropdown-item-text">' + highlightMatch(project.title, query) + '</div>' +
-                    '<span class="dropdown-item-tag">' + project.category + '</span>';
-                item.addEventListener('click', function () { selectSuggestion(project.title); });
-                item.addEventListener('mouseenter', function () {
+                const iconEl = project.card.querySelector('.card-icon');
+                const iconText = iconEl ? iconEl.textContent : '';
+                const iconBox = document.createElement('div');
+                iconBox.className = 'dropdown-item-icon';
+                iconBox.textContent = iconText;
+
+                const titleBox = document.createElement('div');
+                titleBox.className = 'dropdown-item-text';
+                highlightText(titleBox, project.title, query);
+
+                const categoryTag = document.createElement('span');
+                categoryTag.className = 'dropdown-item-tag';
+                categoryTag.textContent = project.category;
+
+                item.append(iconBox, titleBox, categoryTag);
+                item.addEventListener('click', () => selectSuggestion(project.title));
+                item.addEventListener('mouseenter', () => {
                     selectedSuggestionIndex = index;
                     updateSuggestionHighlight();
                 });
@@ -425,9 +456,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        if (resultsSection)        resultsSection.style.display        = 'block';
+        if (resultsSection) resultsSection.style.display = 'block';
         if (recentSearchesSection) recentSearchesSection.style.display = 'none';
-        if (tipsSection)           tipsSection.style.display           = 'none';
+        if (tipsSection) tipsSection.style.display = 'none';
         selectedSuggestionIndex = -1;
     }
 
@@ -489,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '[tabindex]:not([tabindex="-1"])';
         return Array.from(root.querySelectorAll(selector)).filter(function (el) {
             return !el.closest('[aria-hidden="true"]') &&
-                   !el.classList.contains('visually-hidden');
+                !el.classList.contains('visually-hidden');
         });
     }
 
@@ -499,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var focusables = getFocusableElements(modalEl);
             if (!focusables.length) return;
             var first = focusables[0];
-            var last  = focusables[focusables.length - 1];
+            var last = focusables[focusables.length - 1];
             if (e.shiftKey && document.activeElement === first) {
                 e.preventDefault(); last.focus();
             } else if (!e.shiftKey && document.activeElement === last) {
@@ -554,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.style.overflow = '';
         setMainInert(false);
         if (removeTrap) { removeTrap(); removeTrap = null; }
-        if (modalBody)  modalBody.innerHTML = '';
+        if (modalBody) modalBody.innerHTML = '';
         if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
             lastFocusedElement.focus();
         }
