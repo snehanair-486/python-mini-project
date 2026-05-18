@@ -20,7 +20,13 @@ except ImportError:
 
 def play_sound(sound_type):
     if not winsound:
-        print('\a', end='', flush=True)
+        try:
+            if hasattr(tk, '_default_root') and tk._default_root:
+                tk._default_root.bell()
+            else:
+                print('\a', end='', flush=True)
+        except Exception:
+            pass
         return
     try:
         if sound_type == 'correct':
