@@ -52,46 +52,7 @@ function getProjectHTML(projectName) {
     }
 }
 
-function initializeProject(projectName) {
-    //Prevent duplicate listeners+duplicate ui execution
-    //if same project is already active it will not re run init
-    if(activeProject ===projectName ) return;
 
-    activeProject=projectName;
-
-    const initializers = {
-        'rock-paper-scissor': initRockPaperScissor,
-        'dice-rolling': initDiceRolling,
-        'coin-flip': initCoinFlip,
-        'blackjack-21' : initBlackjack,
-        'number-guessing': initNumberGuessing,
-        'hangman': initHangman,
-        'flames': initFlames,
-        'fibonacci': initFibonacci,
-        'progression-recognizer': initProgressionRecognizer,
-        'pascal-triangle': initPascalTriangle,
-        'armstrong': initArmstrong,
-        'calculator': initCalculator,
-        'collatz': initCollatz,
-        'prime-analyzer': initPrimeAnalyzer,
-        'projectile-motion': initProjectileMotion,
-        'coordinate-polar-transform': initCoordinatePolarTransform,
-        'derivative-calculator': initDerivativeCalculator,
-        'morse-code': initMorseCode,
-        'tower-of-hanoi': initTowerOfHanoi,
-        'number-converter': initNumberConverter,
-        'typing-speed-tester': initTypingSpeedTester,
-        'snake-game': initSnakeGame,
-        'whack-a-mole': initWhackaMole,
-        'password-forge': initPasswordForge,
-        '2048-game': init2048Game, // Added explicit mapped hook definition binding reference
-        'typing-speed-tester': initTypingSpeedTester
-    };
-    
-    if (initializers[projectName]) {
-        initializers[projectName]();
-    }
-}
 
 // ============================================
 // ROCK PAPER SCISSORS
@@ -1856,110 +1817,6 @@ function initFlames() {
         `;
     }
 
-    
-    function showSequence() {
-        isPlayingSequence = true;
-        disableButtons(true);
-        displayContent.textContent = "Watch the sequence...";
-        
-        let i = 0;
-        const playNextEmoji = () => {
-            if (i < sequence.length) {
-                const emoji = sequence[i];
-                const button = Array.from(emojiButtons).find(btn => btn.dataset.emoji === emoji);
-                
-                if (button) {
-                    button.classList.add('active');
-                    setTimeout(() => {
-                        button.classList.remove('active');
-                        i++;
-                        setTimeout(playNextEmoji, 500);
-                    }, 600);
-                }
-            } else {
-                isPlayingSequence = false;
-                disableButtons(false);
-                userSequence = [];
-                gameActive = true;
-                displayContent.textContent = "Your turn! Click the emojis...";
-                instructionsDiv.textContent = `👆 Repeat the sequence (${sequence.length} steps)`;
-            }
-        };
-        
-        playNextEmoji();
-    }
-    
-    function startNewRound() {
-        const newEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        sequence.push(newEmoji);
-        userSequence = [];
-        
-        sequenceLengthDisplay.textContent = sequence.length;
-        setTimeout(showSequence, 500);
-    }
-    
-    function handleEmojiClick(emoji, button) {
-        if (isPlayingSequence || !gameActive) return;
-        
-        userSequence.push(emoji);
-        button.classList.add('active');
-        
-        setTimeout(() => {
-            button.classList.remove('active');
-        }, 300);
-        
-        // Check if the emoji matches
-        if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
-            gameOver();
-            return;
-        }
-        
-        // Check if the entire sequence is correct
-        if (userSequence.length === sequence.length) {
-            score += level * 10;
-            scoreDisplay.textContent = score;
-            level++;
-            levelDisplay.textContent = level;
-            
-            instructionsDiv.textContent = "✅ Correct! Get ready for the next round...";
-            gameActive = false;
-            setTimeout(startNewRound, 1500);
-        }
-    }
-    
-    function gameOver() {
-        gameActive = false;
-        disableButtons(true);
-        instructionsDiv.textContent = `❌ Game Over! You reached Level ${level} with Score: ${score}`;
-        displayContent.textContent = `Final Score: ${score}`;
-        startBtn.textContent = "▶️ PLAY AGAIN";
-    }
-    
-    function resetGame() {
-        sequence = [];
-        userSequence = [];
-        score = 0;
-        level = 1;
-        gameActive = false;
-        isPlayingSequence = false;
-        
-        scoreDisplay.textContent = '0';
-        levelDisplay.textContent = '1';
-        sequenceLengthDisplay.textContent = '0';
-        instructionsDiv.textContent = "👇 Click START to begin the game!";
-        displayContent.textContent = "Ready to test your memory?";
-        startBtn.textContent = "▶️ START";
-        
-        disableButtons(true);
-    }
-    
-    startBtn.addEventListener('click', () => {
-        resetGame();
-        gameActive = true;
-        instructionsDiv.textContent = "Watch the sequence...";
-        startNewRound();
-    });
-    
     calculateBtn.addEventListener('click', calculateFlames);
     name1Input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') calculateFlames();
@@ -3871,45 +3728,50 @@ function getProductivePetHTML() {
 
 
 function initializeProject(projectName) {
+    if (activeProject === projectName) return;
+    activeProject = projectName;
+
     const initializers = {
-        'tic-tac-toe': initTicTacToe,
-        'rock-paper-scissor': initRockPaperScissor,
-        'dice-rolling': initDiceRolling,
-        'coin-flip': initCoinFlip,
-        'number-guessing': initNumberGuessing,
-        'hangman': initHangman,
-        'word-scramble': initWordScramble,
-        'flames': initFlames,
-        'dots-boxes': initDotsBoxes,
-        'emoji-memory': initEmojiMemoryGame,
-        'fibonacci': initFibonacci,
-        'progression-recognizer': initProgressionRecognizer,
-        'pascal-triangle': initPascalTriangle,
-        'armstrong': initArmstrong,
-        'calculator': initCalculator,
-        'collatz': initCollatz,
-        'prime-analyzer': initPrimeAnalyzer,
-        'projectile-motion': initProjectileMotion,
-        'coordinate-polar-transform': initCoordinatePolarTransform,
-        'derivative-calculator': initDerivativeCalculator,
-        'morse-code': initMorseCode,
-        'tower-of-hanoi': initTowerOfHanoi,
-        'number-converter': initNumberConverter,
-        'typing-speed-tester': initTypingSpeedTester,
-        'snake-game': initSnakeGame,
-        'password-forge': initPasswordForge, // Register Password Forge initializer
-        'spot-the-difference': initSpotTheDifference,
-        'whack-a-mole': initWhackaMole,
-        'flappy-game': initFlappyGame,
-        'productive-pet': initProductivePet,
-        'simon-says': initSimonSays,
-        '2048-game': init2048Game,
-        'color-palette': initColorPalette, 
-        'math-quiz': initMathQuiz,
+        'tic-tac-toe': 'initTicTacToe',
+        'rock-paper-scissor': 'initRockPaperScissor',
+        'dice-rolling': 'initDiceRolling',
+        'coin-flip': 'initCoinFlip',
+        'blackjack-21': 'initBlackjack',
+        'number-guessing': 'initNumberGuessing',
+        'hangman': 'initHangman',
+        'word-scramble': 'initWordScramble',
+        'flames': 'initFlames',
+        'dots-boxes': 'initDotsBoxes',
+        'emoji-memory': 'initEmojiMemoryGame',
+        'fibonacci': 'initFibonacci',
+        'progression-recognizer': 'initProgressionRecognizer',
+        'pascal-triangle': 'initPascalTriangle',
+        'armstrong': 'initArmstrong',
+        'calculator': 'initCalculator',
+        'collatz': 'initCollatz',
+        'prime-analyzer': 'initPrimeAnalyzer',
+        'projectile-motion': 'initProjectileMotion',
+        'coordinate-polar-transform': 'initCoordinatePolarTransform',
+        'derivative-calculator': 'initDerivativeCalculator',
+        'morse-code': 'initMorseCode',
+        'tower-of-hanoi': 'initTowerOfHanoi',
+        'number-converter': 'initNumberConverter',
+        'typing-speed-tester': 'initTypingSpeedTester',
+        'snake-game': 'initSnakeGame',
+        'password-forge': 'initPasswordForge',
+        'spot-the-difference': 'initSpotTheDifference',
+        'whack-a-mole': 'initWhackaMole',
+        'flappy-game': 'initFlappyGame',
+        'productive-pet': 'initProductivePet',
+        'simon-says': 'initSimonSays',
+        '2048-game': 'init2048Game',
+        'color-palette': 'initColorPalette',
+        'math-quiz': 'initMathQuiz'
     };
     
-    if (initializers[projectName]) {
-        initializers[projectName]();
+    const initializerName = initializers[projectName];
+    if (initializerName && typeof window[initializerName] === 'function') {
+        window[initializerName]();
     }
 }
 
