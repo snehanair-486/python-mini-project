@@ -1,10 +1,21 @@
-function getsnakeGameHTML() {
+function getSnakeGameHTML() {
     return `
         <div class="project-content">
             <h2>🐍 Classic Snake Game</h2>
             <div class="snake-container">
+                <div class="controls-top">
+                    <div class="difficulty-box">
+                        <label for="difficultySelect">Difficulty: </label>
+                        <select id="difficultySelect">
+                            <option value="easy">Easy (1x Score)</option>
+                            <option value="medium" selected>Medium (2x Score)</option>
+                            <option value="hard">Hard (3x Score)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="game-area">
-                    <div id="canvas-wrapper">
+                    <div id="canvas-wrapper" class="ui-canvas-frame">
                         <canvas id="snakeCanvas" width="600" height="400"></canvas>
                         
                         <div id="game-over-overlay" class="hidden">
@@ -18,6 +29,10 @@ function getsnakeGameHTML() {
                         <div class="score-card">
                             <span>Score</span>
                             <div id="score">0</div>
+                        </div>
+                        <div class="score-card high-score-card">
+                            <span>Best</span>
+                            <div id="best-score">0</div>
                         </div>
                     </div>
                 </div>
@@ -40,6 +55,31 @@ function getsnakeGameHTML() {
                 padding: 20px;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
+            .controls-top {
+                margin-bottom: 15px;
+                margin-right: 140px; /* Aligns with canvas center offset */
+            }
+            .difficulty-box select {
+                padding: 6px 10px;
+                border-radius: 6px;
+                border: 1px solid var(--accent-border, #ccc);
+                background-color: #ffffff !important; /* Explicitly forces white background */
+                color: #222222 !important;            /* Explicitly forces dark gray/black text */
+                font-size: 14px;
+                font-family: inherit;
+                font-weight: 500;
+                cursor: pointer;
+                outline: none;
+            }
+            .difficulty-box select {
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #aaa;
+                background-color: #ffffff;
+                color: #222222;
+                font-weight: normal;
+                cursor: pointer;
+            }
             .game-area {
                 display: flex;
                 align-items: flex-start;
@@ -52,18 +92,22 @@ function getsnakeGameHTML() {
             }
             #canvas-wrapper {
                 position: relative;
-                border: 4px solid #2ecc71;
+                border: 4px solid var(--success-color, #2ecc71);
                 border-radius: 12px;
                 overflow: hidden;
                 box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             }
             #snakeCanvas {
-                background-color: #1b262c;
+                background-color: var(--panel-color, #222);
                 background-image: 
-                    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+                    linear-gradient(var(--border-color, rgba(255,255,255,0.05)) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--border-color, rgba(255,255,255,0.05)) 1px, transparent 1px);
                 background-size: 20px 20px;
                 display: block;
+                width: 100%;
+                max-width: 600px;
+                height: auto;
+                touch-action: none;
             }
             #score-board {
                 display: flex;
@@ -71,13 +115,18 @@ function getsnakeGameHTML() {
                 gap: 15px;
             }
             .score-card {
-                background: linear-gradient(135deg, #2ecc71, #27ae60);
-                color: white;
+                background: var(--accent-soft, #fafafa);
+                border: 1px solid var(--accent-border, #ddd);
+                color: var(--text-color, #333);
                 padding: 10px 25px;
                 border-radius: 10px;
                 text-align: center;
                 min-width: 120px;
-                box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+                box-shadow: var(--shadow, 0 4px 6px rgba(0,0,0,0.1));
+            }
+            .high-score-card {
+                border-color: #f1c40f;
+                background: rgba(241, 196, 15, 0.05);
             }
             .score-card span {
                 font-size: 12px;
@@ -91,15 +140,15 @@ function getsnakeGameHTML() {
             .button-group {
                 display: flex;
                 justify-content: center;
-                gap: 30px; /* Space between buttons fixed */
+                gap: 30px;
                 margin-top: 10px;
-                margin-right: 140px; /* Offset to align with canvas center */
+                margin-right: 140px;
             }
             .instruction-box {
                 margin-top: 20px;
                 margin-right: 140px;
                 text-align: center;
-                color: #7f8c8d;
+                color: var(--text-secondary, #666);
                 font-size: 15px;
             }
             #game-over-overlay {
@@ -108,43 +157,44 @@ function getsnakeGameHTML() {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(27, 38, 44, 0.9);
+                background: var(--overlay-color, rgba(0, 0, 0, 0.75));
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 z-index: 10;
-                color: #2ecc71;
+                color: var(--success-color, #2ecc71);
             }
             #game-over-overlay h1 { font-size: 3rem; margin-bottom: 10px; }
             .hidden { display: none !important; }
             .btn-primary {
-                background-color: #2ecc71;
-                color: white;
-                border: none;
                 padding: 12px 25px;
-                border-radius: 8px;
-                font-weight: bold;
                 cursor: pointer;
-                transition: 0.3s;
-            }
-            .btn-primary:hover {
-                background-color: #27ae60;
-                transform: translateY(-2px);
             }
         </style>
     `;
 }
 
-// --- GAME LOGIC ---
+// --- GAME LOGIC STATE ---
 let direction = { x: 0, y: 0 };
-let speed = 7;
+let speed = 9; // System baseline operational configuration state
+let scoreMultiplier = 2; // Baseline multiplier scalar state
 let score = 0;
 let lastPaintTime = 0;
 let snakeArr = [{ x: 13, y: 10 }];
 let food = { x: 6, y: 7 };
 
+// Profile configuration mapping matrices
+const CONFIG_DIFFICULTY = {
+    easy:   { speed: 5,  multiplier: 1 },
+    medium: { speed: 9,  multiplier: 2 },
+    hard:   { speed: 14, multiplier: 3 }
+};
+
 function main(ctime) {
+    const canvas = document.getElementById('snakeCanvas');
+    if (!canvas) return; // Exit loop if the game modal has been closed
+    
     window.requestAnimationFrame(main);
     if ((ctime - lastPaintTime) / 1000 < 1 / speed) {
         return;
@@ -164,20 +214,50 @@ function isCollide(snake) {
     return false;
 }
 
+function applyDifficultySettings() {
+    const selector = document.getElementById('difficultySelect');
+    if (selector) {
+        const value = selector.value;
+        speed = CONFIG_DIFFICULTY[value].speed;
+        scoreMultiplier = CONFIG_DIFFICULTY[value].multiplier;
+    }
+}
+
+function updateBestScoreUI() {
+    const bestScore = localStorage.getItem('snakeBestScore') || 0;
+    const bestScoreElement = document.getElementById('best-score');
+    if (bestScoreElement) {
+        bestScoreElement.innerHTML = bestScore;
+    }
+}
+
+function checkAndSaveHighScore() {
+    const currentBest = parseInt(localStorage.getItem('snakeBestScore') || '0', 10);
+    if (score > currentBest) {
+        localStorage.setItem('snakeBestScore', score);
+        updateBestScoreUI();
+    }
+}
+
 function gameEngine() {
     if (isCollide(snakeArr)) {
         direction = { x: 0, y: 0 };
         document.getElementById('final-score').innerHTML = score;
         document.getElementById('game-over-overlay').classList.remove('hidden');
-        snakeArr = [{ x: 13, y: 10 }];
-        score = 0;
-        document.getElementById('score').innerHTML = score;
+        
+        // Execute persistent local evaluations
+        checkAndSaveHighScore();
+        
+        // Restore controls visibility states
+        const selector = document.getElementById('difficultySelect');
+        if (selector) selector.disabled = false;
+
         return;
     }
 
     // Eating food
     if (snakeArr[0].y === food.y && snakeArr[0].x === food.x) {
-        score += 1;
+        score += (1 * scoreMultiplier); // Scaled multiplier calculations
         document.getElementById('score').innerHTML = score;
         snakeArr.unshift({ x: snakeArr[0].x + direction.x, y: snakeArr[0].y + direction.y });
         let a = 2, b = 16;
@@ -209,27 +289,81 @@ function gameEngine() {
     ctx.fillRect(food.x * 20, food.y * 20, 18, 18);
 }
 
-// IMPORTANT: Function to initialize listeners after HTML is loaded
+function restartGame() {
+    const selector = document.getElementById('difficultySelect');
+    applyDifficultySettings();
+    if (selector) selector.disabled = true;
+    document.getElementById('game-over-overlay').classList.add('hidden');
+    direction = { x: 1, y: 0 };
+    snakeArr = [{ x: 13, y: 10 }];
+    score = 0;
+    document.getElementById('score').innerHTML = score;
+    food = { x: 6, y: 7 };
+}
+
+// Initialize execution listeners
 function initSnakeGame() {
     window.requestAnimationFrame(main);
+    
+    // Set initial historic rendering metrics
+    updateBestScoreUI();
+    function restartGame() {
+    // Hide game over overlay
+    document.getElementById('game-over-overlay').classList.add('hidden');
+
+    // Reset snake
+    snakeArr = [{ x: 13, y: 10 }];
+
+    // Reset score
+    score = 0;
+    document.getElementById('score').innerHTML = score;
+
+    // Reset direction and start moving
+    direction = { x: 1, y: 0 };
+
+    // Generate new food
+    food = {
+        x: Math.round(2 + (16 - 2) * Math.random()),
+        y: Math.round(2 + (16 - 2) * Math.random())
+    };
+
+    // Re-enable difficulty selection before start
+    if (selector) {
+        selector.disabled = true;
+    }
+
+    // Reset frame timing
+    lastPaintTime = 0;
+}
+
+    // Map difficulty listener parameters
+    const selector = document.getElementById('difficultySelect');
+    if (selector) {
+        selector.addEventListener('change', applyDifficultySettings);
+    }
+    // Initialize standard values configuration parameters
+    applyDifficultySettings();
 
     document.getElementById('startGameBtn').addEventListener('click', () => {
+        applyDifficultySettings();
+        // Prevent changing parameter matrices on an active engine run
+        if (selector) selector.disabled = true;
+        document.getElementById('game-over-overlay').classList.add('hidden');
         direction = { x: 1, y: 0 }; // Start moving right
     });
 
-    document.getElementById('restartSnakeBtn').addEventListener('click', () => {
-        location.reload();
-    });
+    document.getElementById('restartSnakeBtn').addEventListener('click', restartGame);
 
-    document.getElementById('overlayRestartBtn').addEventListener('click', () => {
-        document.getElementById('game-over-overlay').classList.add('hidden');
-        direction = { x: 0, y: 0 };
-        snakeArr = [{ x: 13, y: 10 }];
-        score = 0;
-        document.getElementById('score').innerHTML = score;
-    });
+    document.getElementById('overlayRestartBtn').addEventListener('click', restartGame);
 
     window.addEventListener('keydown', e => {
+        // Change difficulty selection dynamic evaluations if arrow key registers 
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            if (selector && !selector.disabled) {
+                selector.disabled = true;
+            }
+        }
+
         switch (e.key) {
             case "ArrowUp": if (direction.y !== 1) { direction.x = 0; direction.y = -1; } break;
             case "ArrowDown": if (direction.y !== -1) { direction.x = 0; direction.y = 1; } break;
@@ -237,4 +371,36 @@ function initSnakeGame() {
             case "ArrowRight": if (direction.x !== -1) { direction.x = 1; direction.y = 0; } break;
         }
     });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const canvas = document.getElementById('snakeCanvas');
+    if (canvas) {
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            let touchEndX = e.changedTouches[0].screenX;
+            let touchEndY = e.changedTouches[0].screenY;
+            
+            let dx = touchEndX - touchStartX;
+            let dy = touchEndY - touchStartY;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 30 && direction.x !== -1) { direction.x = 1; direction.y = 0; }
+                else if (dx < -30 && direction.x !== 1) { direction.x = -1; direction.y = 0; }
+            } else {
+                if (dy > 30 && direction.y !== -1) { direction.x = 0; direction.y = 1; }
+                else if (dy < -30 && direction.y !== 1) { direction.x = 0; direction.y = -1; }
+            }
+        }, { passive: false });
+    }
 }
+
+// Global scope assignments
+window.getSnakeGameHTML = getSnakeGameHTML;
+window.initSnakeGame = initSnakeGame;
